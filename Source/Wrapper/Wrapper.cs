@@ -126,6 +126,8 @@ namespace CSharpConsole
             public int shiftAllCBuffersBindings;
             public int shiftAllUABuffersBindings;
 
+            public bool mslDecoratingBinding; // Use SPIR-V bindings directly as MSL bindings
+
             public static OptionsDesc Default
             {
                 get

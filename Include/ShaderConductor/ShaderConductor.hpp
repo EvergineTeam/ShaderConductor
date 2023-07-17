@@ -181,6 +181,8 @@ namespace ShaderConductor
             int shiftAllSamplersBindings = 0;
             int shiftAllCBuffersBindings = 0;
             int shiftAllUABuffersBindings = 0;
+
+            bool mslDecoratingBinding = false; // Use SPIR-V bindings directly as MSL bindings
         };
 
         struct TargetDesc

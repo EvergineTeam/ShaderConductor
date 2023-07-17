@@ -695,7 +695,8 @@ namespace
         return ret;
     }
 
-    Compiler::ResultDesc CrossCompile(const Compiler::ResultDesc& binaryResult, const Compiler::SourceDesc& source,
+    Compiler::ResultDesc CrossCompile(const Compiler::Options& options, const Compiler::ResultDesc& binaryResult,
+                                      const Compiler::SourceDesc& source,
                                       const Compiler::TargetDesc& target)
     {
         assert((target.language != ShadingLanguage::Dxil) && (target.language != ShadingLanguage::SpirV));
@@ -881,6 +882,8 @@ namespace
             mslOpts.platform = (target.language == ShadingLanguage::Msl_iOS) ? spirv_cross::CompilerMSL::Options::iOS
                                                                              : spirv_cross::CompilerMSL::Options::macOS;
 
+            mslOpts.enable_decoration_binding = options.mslDecoratingBinding;
+
             mslCompiler->set_msl_options(mslOpts);
 
             const auto& resources = mslCompiler->get_shader_resources();
@@ -954,7 +957,7 @@ namespace
         return ret;
     }
 
-    Compiler::ResultDesc ConvertBinary(const Compiler::ResultDesc& binaryResult, const Compiler::SourceDesc& source,
+    Compiler::ResultDesc ConvertBinary(const Compiler::Options& options, const Compiler::ResultDesc& binaryResult, const Compiler::SourceDesc& source,
                                        const Compiler::TargetDesc& target)
     {
         if (!binaryResult.hasError)
@@ -976,7 +979,7 @@ namespace
                 case ShadingLanguage::Essl:
                 case ShadingLanguage::Msl_macOS:
                 case ShadingLanguage::Msl_iOS:
-                    return CrossCompile(binaryResult, source, target);
+                    return CrossCompile(options, binaryResult, source, target);
 
                 default:
                     llvm_unreachable("Invalid shading language.");
@@ -1158,7 +1161,7 @@ namespace ShaderConductor
                 binaryResult = spirvBinaryResult;
             }
 
-            results[i] = ConvertBinary(binaryResult, sourceOverride, targets[i]);
+            results[i] = ConvertBinary(options, binaryResult, sourceOverride, targets[i]);
         }
     }
 
@@ -1262,7 +1265,7 @@ namespace ShaderConductor
         Compiler::SourceDesc source{};
         source.entryPoint = modules.entryPoint;
         source.stage = modules.stage;
-        return ConvertBinary(binaryResult, source, target);
+        return ConvertBinary(options, binaryResult, source, target);
     }
 } // namespace ShaderConductor
 
