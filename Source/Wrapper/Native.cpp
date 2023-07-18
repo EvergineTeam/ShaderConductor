@@ -51,6 +51,7 @@ void Compile(SourceDescription* source, OptionsDescription* optionsDesc, TargetD
     options.shiftAllSamplersBindings = optionsDesc->shiftAllSamplersBindings;
     options.shiftAllCBuffersBindings = optionsDesc->shiftAllCBuffersBindings;
     options.shiftAllUABuffersBindings = optionsDesc->shiftAllUABuffersBindings;
+    options.mslDecoratingBinding = optionsDesc->mslDecoratingBinding;
 
     Compiler::TargetDesc targetDesc{};
     targetDesc.language = target->shadingLanguage;

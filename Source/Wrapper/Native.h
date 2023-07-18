@@ -58,6 +58,8 @@ struct OptionsDescription
     int shiftAllSamplersBindings;
     int shiftAllCBuffersBindings;
     int shiftAllUABuffersBindings;
+
+    bool mslDecoratingBinding = false; // Use SPIR-V bindings directly as MSL bindings
 };
 
 struct TargetDescription
