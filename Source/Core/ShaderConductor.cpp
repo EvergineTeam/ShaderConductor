@@ -886,20 +886,23 @@ namespace
 
             mslCompiler->set_msl_options(mslOpts);
 
-            const auto& resources = mslCompiler->get_shader_resources();
-
-            uint32_t textureBinding = 0;
-            for (const auto& image : resources.separate_images)
+            if (!mslOpts.enable_decoration_binding)
             {
-                mslCompiler->set_decoration(image.id, spv::DecorationBinding, textureBinding);
-                ++textureBinding;
-            }
+                const auto& resources = mslCompiler->get_shader_resources();
 
-            uint32_t samplerBinding = 0;
-            for (const auto& sampler : resources.separate_samplers)
-            {
-                mslCompiler->set_decoration(sampler.id, spv::DecorationBinding, samplerBinding);
-                ++samplerBinding;
+                uint32_t textureBinding = 0;
+                for (const auto& image : resources.separate_images)
+                {
+                    mslCompiler->set_decoration(image.id, spv::DecorationBinding, textureBinding);
+                    ++textureBinding;
+                }
+
+                uint32_t samplerBinding = 0;
+                for (const auto& sampler : resources.separate_samplers)
+                {
+                    mslCompiler->set_decoration(sampler.id, spv::DecorationBinding, samplerBinding);
+                    ++samplerBinding;
+                }
             }
         }
 
