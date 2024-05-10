@@ -15,12 +15,12 @@ out vec4 out_var_SV_Target;
 
 void main()
 {
-    vec4 _45 = texture(SPIRV_Cross_CombinedcolorTexpointSampler, varying_TEXCOORD0);
-    vec3 _62 = (_45.xyz * (0.7200000286102294921875 / ((texture(SPIRV_Cross_CombinedlumTexpointSampler, vec2(0.5)).x * cbPS.lumStrength) + 0.001000000047497451305389404296875))).xyz;
-    vec3 _66 = (_62 * (vec3(1.0) + (_62 * vec3(0.666666686534881591796875)))).xyz;
-    vec3 _71 = (_66 / (vec3(1.0) + _66)).xyz + (texture(SPIRV_Cross_CombinedbloomTexlinearSampler, varying_TEXCOORD0).xyz * 0.60000002384185791015625);
-    vec4 _73 = vec4(_71.x, _71.y, _71.z, _45.w);
-    _73.w = 1.0;
-    out_var_SV_Target = _73;
+    vec4 _44 = texture(SPIRV_Cross_CombinedcolorTexpointSampler, varying_TEXCOORD0);
+    vec3 _60 = (_44.xyz * (0.7200000286102294921875 / (texture(SPIRV_Cross_CombinedlumTexpointSampler, vec2(0.5)).x * cbPS.lumStrength + 0.001000000047497451305389404296875))).xyz;
+    vec3 _63 = (_60 * (_60 * vec3(0.666666686534881591796875) + vec3(1.0))).xyz;
+    vec3 _68 = (_63 / (vec3(1.0) + _63)).xyz + (texture(SPIRV_Cross_CombinedbloomTexlinearSampler, varying_TEXCOORD0).xyz * 0.60000002384185791015625);
+    vec4 _69 = vec4(_68.x, _68.y, _68.z, _44.w);
+    _69.w = 1.0;
+    out_var_SV_Target = _69;
 }
 

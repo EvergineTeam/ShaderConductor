@@ -14,7 +14,7 @@ float3 DistributionTerm(float3 halfway, float3 normal, float shininess)
 float3 FresnelTerm(float3 lightVec, float3 halfway, float3 specColor)
 {
     float eN = saturate(dot(lightVec, halfway));
-    return specColor > 0 ? specColor + (1 - specColor) * pow(1 - eN, 5) : 0;
+    return select(specColor > 0, specColor + (1 - specColor) * pow(1 - eN, 5), 0);
 }
 
 float3 SpecularTerm(float3 specColor, float3 lightVec, float3 halfway, float3 normal, float shininess)

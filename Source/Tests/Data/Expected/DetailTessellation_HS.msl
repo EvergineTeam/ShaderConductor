@@ -86,8 +86,7 @@ kernel void main0(main0_in in [[stage_in]], constant type_cbMain& cbMain [[buffe
     spvUnsafeArray<float2, 3> _60 = spvUnsafeArray<float2, 3>({ gl_in[0].in_var_TEXCOORD0, gl_in[1].in_var_TEXCOORD0, gl_in[2].in_var_TEXCOORD0 });
     spvUnsafeArray<float3, 3> _61 = spvUnsafeArray<float3, 3>({ gl_in[0].in_var_LIGHTVECTORTS, gl_in[1].in_var_LIGHTVECTORTS, gl_in[2].in_var_LIGHTVECTORTS });
     spvUnsafeArray<VS_OUTPUT_HS_INPUT, 3> _77 = spvUnsafeArray<VS_OUTPUT_HS_INPUT, 3>({ VS_OUTPUT_HS_INPUT{ _58[0], _59[0], _60[0], _61[0] }, VS_OUTPUT_HS_INPUT{ _58[1], _59[1], _60[1], _61[1] }, VS_OUTPUT_HS_INPUT{ _58[2], _59[2], _60[2], _61[2] } });
-    spvUnsafeArray<VS_OUTPUT_HS_INPUT, 3> param_var_inputPatch;
-    param_var_inputPatch = _77;
+    spvUnsafeArray<VS_OUTPUT_HS_INPUT, 3> param_var_inputPatch = _77;
     gl_out[gl_InvocationID].out_var_WORLDPOS = param_var_inputPatch[gl_InvocationID].worldPos;
     gl_out[gl_InvocationID].out_var_NORMAL = param_var_inputPatch[gl_InvocationID].normal;
     gl_out[gl_InvocationID].out_var_TEXCOORD0 = param_var_inputPatch[gl_InvocationID].texCoord;

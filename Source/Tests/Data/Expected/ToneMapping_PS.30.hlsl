@@ -22,13 +22,13 @@ struct SPIRV_Cross_Output
 
 void frag_main()
 {
-    float4 _45 = tex2D(SPIRV_Cross_CombinedcolorTexpointSampler, in_var_TEXCOORD0);
-    float3 _62 = (_45.xyz * (0.7200000286102294921875f / ((tex2D(SPIRV_Cross_CombinedlumTexpointSampler, 0.5f.xx).x * cbPS_lumStrength) + 0.001000000047497451305389404296875f))).xyz;
-    float3 _66 = (_62 * (1.0f.xxx + (_62 * 0.666666686534881591796875f.xxx))).xyz;
-    float3 _71 = (_66 / (1.0f.xxx + _66)).xyz + (tex2D(SPIRV_Cross_CombinedbloomTexlinearSampler, in_var_TEXCOORD0).xyz * 0.60000002384185791015625f);
-    float4 _73 = float4(_71.x, _71.y, _71.z, _45.w);
-    _73.w = 1.0f;
-    out_var_SV_Target = _73;
+    float4 _44 = tex2D(SPIRV_Cross_CombinedcolorTexpointSampler, in_var_TEXCOORD0);
+    float3 _60 = (_44.xyz * (0.7200000286102294921875f / mad(tex2D(SPIRV_Cross_CombinedlumTexpointSampler, 0.5f.xx).x, cbPS_lumStrength, 0.001000000047497451305389404296875f))).xyz;
+    float3 _63 = (_60 * mad(_60, 0.666666686534881591796875f.xxx, 1.0f.xxx)).xyz;
+    float3 _68 = (_63 / (1.0f.xxx + _63)).xyz + (tex2D(SPIRV_Cross_CombinedbloomTexlinearSampler, in_var_TEXCOORD0).xyz * 0.60000002384185791015625f);
+    float4 _69 = float4(_68.x, _68.y, _68.z, _44.w);
+    _69.w = 1.0f;
+    out_var_SV_Target = _69;
 }
 
 SPIRV_Cross_Output main(SPIRV_Cross_Input stage_input)

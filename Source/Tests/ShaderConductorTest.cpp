@@ -120,7 +120,8 @@ namespace
 
         const auto result = Compiler::Compile({source.c_str(), inputFileName.c_str(), "", ShaderStage::PixelShader}, {}, target);
 
-        EXPECT_FALSE(result.hasError);
+        const std::string_view errorMsg((const char*)result.errorWarningMsg.Data(), result.errorWarningMsg.Size());
+        EXPECT_FALSE(result.hasError) << errorMsg;
         EXPECT_FALSE(result.isText);
 
         return {moduleName, std::move(result.target)};
@@ -627,7 +628,8 @@ namespace
                 Compiler::Link({"main", ShaderStage::PixelShader, testModules[i], sizeof(testModules[i]) / sizeof(testModules[i][0])}, {},
                                {ShadingLanguage::Dxil, ""});
 
-            EXPECT_FALSE(linkedResult.hasError);
+            const std::string_view errorMsg((const char*)linkedResult.errorWarningMsg.Data(), linkedResult.errorWarningMsg.Size());
+            EXPECT_FALSE(linkedResult.hasError) << errorMsg;
             EXPECT_FALSE(linkedResult.isText);
 
             Compiler::DisassembleDesc disasmDesc;
