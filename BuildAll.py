@@ -5,7 +5,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import multiprocessing, os, platform, subprocess, sys
+import multiprocessing, os, platform, subprocess, sys, argparse
 
 def LogError(message):
 	print("[E] %s" % message)
@@ -110,7 +110,7 @@ class BatchCommand:
 		os.remove(batchFileName)
 		return retCode
 
-def Build(hostPlatform, hostArch, buildSys, compiler, arch, configuration, tblgenMode, tblgenPath):
+def Build(hostPlatform, hostCPU, buildSys, compiler, targetCPU, configuration, tblgenMode, tblgenPath):
 	originalDir = os.path.abspath(os.curdir)
 
 	if not os.path.exists("Build"):
@@ -118,7 +118,7 @@ def Build(hostPlatform, hostArch, buildSys, compiler, arch, configuration, tblge
 
 	multiConfig = (buildSys.find("vs") == 0)
 
-	buildDir = "Build/%s-%s-%s-%s" % (buildSys, hostPlatform, compiler, arch)
+	buildDir = "Build/%s-%s-%s-%s" % (buildSys, hostPlatform, compiler, targetCPU)
 	if (not multiConfig) or (configuration == "clangformat"):
 		buildDir += "-%s" % configuration;
 	if not os.path.exists(buildDir):
@@ -143,18 +143,19 @@ def Build(hostPlatform, hostArch, buildSys, compiler, arch, configuration, tblge
 			vsFolder = FindVS2017Folder(programFilesFolder)
 		elif (buildSys == "vs2015") or ((buildSys == "ninja") and (compiler == "vc140")):
 			vsFolder = FindVS2015Folder(programFilesFolder)
-		if "x64" == arch:
+
+		if "x64" == targetCPU:
 			vcOption = "amd64"
-			vcArch = "x64"
-		elif "x86" == arch:
+			vcTargetCPU = "x64"
+		elif "x86" == targetCPU:
 			vcOption = "x86"
-			vcArch = "Win32"
-		elif "arm64" == arch:
+			vcTargetCPU = "Win32"
+		elif "arm64" == targetCPU:
 			vcOption = "amd64_arm64"
-			vcArch = "ARM64"
-		elif "arm" == arch:
+			vcTargetCPU = "ARM64"
+		elif "arm" == targetCPU:
 			vcOption = "amd64_arm"
-			vcArch = "ARM"
+			vcTargetCPU = "ARM"
 		else:
 			LogError("Unsupported architecture.\n")
 		vcToolset = ""
@@ -176,7 +177,7 @@ def Build(hostPlatform, hostArch, buildSys, compiler, arch, configuration, tblge
 		if (configuration == "clangformat"):
 			options = "-DSC_CLANGFORMAT=\"ON\""
 		else:
-			options = "-DCMAKE_BUILD_TYPE=\"%s\" -DSC_ARCH_NAME=\"%s\" %s" % (configuration, arch, tblgenOptions)
+			options = "-DCMAKE_BUILD_TYPE=\"%s\" -DSC_ARCH_NAME=\"%s\" %s" % (configuration, targetCPU, tblgenOptions)
 		batCmd.AddCommand("cmake -G Ninja %s ../../" % options)
 		if tblgenMode:
 			batCmd.AddCommand("ninja clang-tblgen -j%d" % parallel)
@@ -196,9 +197,10 @@ def Build(hostPlatform, hostArch, buildSys, compiler, arch, configuration, tblge
 			cmake_options = "-DSC_CLANGFORMAT=\"ON\""
 			msbuild_options = ""
 		else:
-			cmake_options = "-T %shost=x64 -A %s %s" % (vcToolset, vcArch, tblgenOptions)
-			msbuild_options = "/m:%d /v:m /p:Configuration=%s,Platform=%s" % (parallel, configuration, vcArch)
+			cmake_options = "-T %shost=x64 -A %s %s" % (vcToolset, vcTargetCPU, tblgenOptions)
+			msbuild_options = "/m:%d /v:m /p:Configuration=%s,Platform=%s" % (parallel, configuration, vcTargetCPU)
 		batCmd.AddCommand("cmake -G %s %s ../../" % (generator, cmake_options))
+
 		if tblgenMode:
 			batCmd.AddCommand("MSBuild External\\DirectXShaderCompiler\\tools\\clang\\utils\\TableGen\\clang-tblgen.vcxproj /nologo %s" % msbuild_options)
 			batCmd.AddCommand("MSBuild External\\DirectXShaderCompiler\\utils\\TableGen\\llvm-tblgen.vcxproj /nologo %s" % msbuild_options)
@@ -229,26 +231,44 @@ if __name__ == "__main__":
 	elif 0 == hostPlatform.find("darwin"):
 		hostPlatform = "osx"
 
-	hostArch = platform.machine()
-	if (hostArch == "AMD64") or (hostArch == "x86_64"):
-		hostArch = "x64"
-	elif (hostArch == "i386"):
-		hostArch = "x86"
-	elif (hostArch == "ARM64"):
-		hostArch = "arm64"
+	hostCPU = platform.machine()
+	if (hostCPU == "AMD64") or (hostCPU == "x86_64"):
+		hostCPU = "x64"
+	elif (hostCPU == "i386"):
+		hostCPU = "x86"
+	elif (hostCPU == "ARM64"):
+		hostCPU = "arm64"
 	else:
-		LogError("Unknown host architecture %s.\n" % hostArch)
+		LogError("Unknown host architecture %s.\n" % hostCPU)
 
-	argc = len(sys.argv);
-	if (argc > 1):
-		buildSys = sys.argv[1]
+	argParser = argparse.ArgumentParser()
+	argParser.add_argument("--targetOS", help="OS (win, linux, osx)")
+	argParser.add_argument("--targetCPU", help="CPU (x86, x64, arm64)")
+	argParser.add_argument("--buildSys", help="Build system (vs2022, vs2019, vs2017, vs2015, ninja)")
+	argParser.add_argument("--compiler", help="Compiler (vc143, vc142, vc141, vc140, gcc)")
+	argParser.add_argument("--configuration", help="Configuration (Release, Debug, clangformat)")
+	args = argParser.parse_args()
+
+	if args.targetOS:
+		targetOS = args.targetOS
+	else:
+		targetOS = hostPlatform
+
+	if args.targetCPU:
+		targetCPU = args.targetCPU
+	else:
+		targetCPU = hostCPU
+
+	if args.buildSys:
+		buildSys = args.buildSys
 	else:
 		if hostPlatform == "win":
 			buildSys = "vs2022"
 		else:
 			buildSys = "ninja"
-	if (argc > 2):
-		compiler = sys.argv[2]
+
+	if args.compiler:
+		compiler = args.compiler
 	else:
 		if buildSys == "vs2022":
 			compiler = "vc143"
@@ -260,19 +280,16 @@ if __name__ == "__main__":
 			compiler = "vc140"
 		else:
 			compiler = "gcc"
-	if (argc > 3):
-		arch = sys.argv[3]
-	else:
-		arch = "x64"
-	if (argc > 4):
-		configuration = sys.argv[4]
+
+	if args.configuration:
+		configuration = args.configuration
 	else:
 		configuration = "Release"
 
 	tblgenPath = None
-	if (configuration != "clangformat") and (hostArch != arch) and (not ((hostArch == "x64") and (arch == "x86"))):
+	if (configuration != "clangformat") and buildSys == "ninja" and (hostCPU != targetCPU) and (not ((hostCPU == "x64") and (targetCPU == "x86"))):
 		# Cross compiling:
 		# Generate a project with host architecture, build clang-tblgen and llvm-tblgen, and keep the path of clang-tblgen and llvm-tblgen
-		tblgenPath = Build(hostPlatform, hostArch, buildSys, compiler, hostArch, configuration, True, None)
+		tblgenPath = Build(hostPlatform, hostCPU, buildSys, compiler, hostCPU, configuration, True, None)
 
-	Build(hostPlatform, hostArch, buildSys, compiler, arch, configuration, False, tblgenPath)
+	Build(hostPlatform, hostCPU, buildSys, compiler, targetCPU, configuration, False, tblgenPath)
