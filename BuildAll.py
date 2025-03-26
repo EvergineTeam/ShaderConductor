@@ -236,7 +236,7 @@ if __name__ == "__main__":
 		hostCPU = "x64"
 	elif (hostCPU == "i386"):
 		hostCPU = "x86"
-	elif (hostCPU == "ARM64"):
+	elif (hostCPU.upper() == "ARM64"):
 		hostCPU = "arm64"
 	else:
 		LogError("Unknown host architecture %s.\n" % hostCPU)
