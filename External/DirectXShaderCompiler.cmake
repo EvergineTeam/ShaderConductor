@@ -1,7 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
-
-set(DirectXShaderCompiler_REV "634a23537df7e85512437a4976f9bf9fcd095e18")
+# good "634a23537df7e85512437a4976f9bf9fcd095e18"
+# We want to update to "11e1318c3ed77aa08326e16eaf52598ad6430546"
+set(DirectXShaderCompiler_REV "11e1318c3ed77aa08326e16eaf52598ad6430546")
 
 UpdateExternalLib("DirectXShaderCompiler" "https://github.com/Microsoft/DirectXShaderCompiler.git" ${DirectXShaderCompiler_REV})
 
@@ -41,39 +42,26 @@ set(SPIRV_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(SPIRV_SKIP_EXECUTABLES ON CACHE BOOL "" FORCE)
 set(SPIRV_SKIP_TESTS ON CACHE BOOL "" FORCE)
 add_subdirectory(DirectXShaderCompiler EXCLUDE_FROM_ALL)
-foreach(target
-    "clang" "dxc"
-    "clangAnalysis" "clangAST" "clangASTMatchers" "clangBasic" "clangCodeGen" "clangDriver" "clangEdit" "clangFormat" "clangFrontend"
-    "clangFrontendTool" "clangIndex" "clangLex" "clangParse" "clangRewrite" "clangRewriteFrontend" "clangSema" "clangSPIRV" "clangTooling"
-    "clangToolingCore" "dxcompiler" "libclang"
-    "ClangAttrClasses" "ClangAttrDump" "ClangAttrHasAttributeImpl" "ClangAttrImpl" "ClangAttrList" "ClangAttrParsedAttrImpl"
-    "ClangAttrParsedAttrKinds" "ClangAttrParsedAttrList" "ClangAttrParserStringSwitches" "ClangAttrPCHRead" "ClangAttrPCHWrite"
-    "ClangAttrSpellingListIndex" "ClangAttrTemplateInstantiate" "ClangAttrVisitor" "ClangCommentCommandInfo" "ClangCommentCommandList"
-    "ClangCommentHTMLNamedCharacterReferences" "ClangCommentHTMLTags" "ClangCommentHTMLTagsProperties" "ClangCommentNodes" "ClangDeclNodes"
-    "ClangDiagnosticAnalysis" "ClangDiagnosticAST" "ClangDiagnosticComment" "ClangDiagnosticCommon" "ClangDiagnosticDriver"
-    "ClangDiagnosticFrontend" "ClangDiagnosticGroups" "ClangDiagnosticIndexName" "ClangDiagnosticLex" "ClangDiagnosticParse"
-    "ClangDiagnosticSema" "ClangDiagnosticSerialization" "ClangStmtNodes"
-    "LLVMAnalysis" "LLVMAsmParser" "LLVMBitReader" "LLVMBitWriter" "LLVMCore" "LLVMDxcSupport" "LLVMDXIL" "LLVMDxilContainer"
-    "LLVMDxilPIXPasses" "LLVMDxilRootSignature" "LLVMDxrFallback" "LLVMHLSL" "LLVMInstCombine" "LLVMipa" "LLVMipo" "LLVMIRReader"
-    "LLVMLinker" "LLVMLTO" "LLVMMSSupport" "LLVMOption" "LLVMPasses" "LLVMPassPrinters" "LLVMProfileData" "LLVMScalarOpts" "LLVMSupport"
-    "LLVMTableGen" "LLVMTarget" "LLVMTransformUtils" "LLVMVectorize"
-    "ClangDriverOptions" "DxcEtw" "intrinsics_gen" "TablegenHLSLOptions"
-    "clang-tblgen" "llvm-tblgen" "hlsl_dxcversion_autogen" "hlsl_version_autogen")
+
+function(find_targets targets DIR)
+    get_property(TGTS DIRECTORY "${DIR}" PROPERTY BUILDSYSTEM_TARGETS)
+    foreach(TGT IN LISTS TGTS)
+        message(STATUS "Target: ${TGT}")
+        set(targets ${targets} ${TGT})
+    endforeach()
+
+    get_property(SUBDIRS DIRECTORY "${DIR}" PROPERTY SUBDIRECTORIES)
+    foreach(SUBDIR IN LISTS SUBDIRS)
+        find_targets(targets "${SUBDIR}")
+    endforeach()
+endfunction()
+
+find_targets(targets DirectXShaderCompiler)
+
+foreach(target ${targets})
     get_target_property(vsFolder ${target} FOLDER)	
     if(NOT vsFolder)
         set(vsFolder "")
     endif()
     set_target_properties(${target} PROPERTIES FOLDER "External/DirectXShaderCompiler/${vsFolder}")
 endforeach()
-if(WIN32)
-    foreach(target
-        "dndxc" "dxa" "dxl" "dxopt" "dxr" "dxv"
-        "d3dcompiler_dxc_bridge" "dxlib_sample" "dxrfallbackcompiler"
-        "dxexp" "LLVMDxilDia")
-        get_target_property(vsFolder ${target} FOLDER)
-        if(NOT vsFolder)
-            set(vsFolder "")
-        endif()
-        set_target_properties(${target} PROPERTIES FOLDER "External/DirectXShaderCompiler/${vsFolder}")
-    endforeach()
-endif()
