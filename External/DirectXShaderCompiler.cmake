@@ -42,19 +42,6 @@ set(SPIRV_SKIP_EXECUTABLES ON CACHE BOOL "" FORCE)
 set(SPIRV_SKIP_TESTS ON CACHE BOOL "" FORCE)
 add_subdirectory(DirectXShaderCompiler EXCLUDE_FROM_ALL)
 
-function(find_targets targets DIR)
-    get_property(TGTS DIRECTORY "${DIR}" PROPERTY BUILDSYSTEM_TARGETS)
-    foreach(TGT IN LISTS TGTS)
-        message(STATUS "Target: ${TGT}")
-        set(targets ${targets} ${TGT})
-    endforeach()
-
-    get_property(SUBDIRS DIRECTORY "${DIR}" PROPERTY SUBDIRECTORIES)
-    foreach(SUBDIR IN LISTS SUBDIRS)
-        find_targets(targets "${SUBDIR}")
-    endforeach()
-endfunction()
-
 find_targets(targets DirectXShaderCompiler)
 
 foreach(target ${targets})
