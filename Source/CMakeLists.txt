@@ -53,7 +53,7 @@ if(CMAKE_C_COMPILER_ID MATCHES MSVC)
 else()
 	foreach(flagVar
 		CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
-		set(${flagVar} "${${flagVar}} -W -Wall -Werror")
+		set(${flagVar} "${${flagVar}} -W -Wall")
 		if(SC_ARCH_NAME STREQUAL "x64")
 			set(${flagVar} "${${flagVar}} -march=core2 -msse2")
 		endif()
