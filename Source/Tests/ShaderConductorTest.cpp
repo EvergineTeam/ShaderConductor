@@ -122,6 +122,12 @@ namespace
 
         EXPECT_FALSE(result.hasError);
         EXPECT_FALSE(result.isText);
+        if(result.hasError) {
+            std::cout << "Error compiling: "
+                << "moduleName " << moduleName
+                << "inputFileName " << inputFileName << std::endl
+                << (const char*)result.errorWarningMsg.Data() << std::endl;
+        }
 
         return {moduleName, std::move(result.target)};
     }

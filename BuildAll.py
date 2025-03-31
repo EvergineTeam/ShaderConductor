@@ -239,7 +239,7 @@ if __name__ == "__main__":
 	else:
 		LogError("Unknown host architecture %s.\n" % hostArch)
 
-	argc = len(sys.argv);
+	argc = len(sys.argv)
 	if (argc > 1):
 		buildSys = sys.argv[1]
 	else:
