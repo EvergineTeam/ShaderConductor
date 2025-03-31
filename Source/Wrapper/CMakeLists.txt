@@ -21,7 +21,7 @@ add_dependencies(${DLL_NAME} ShaderConductor)
 
 set_target_properties(${DLL_NAME} PROPERTIES FOLDER "Wrapper")
 
-
+if (CMAKE_C_COMPILER_ID MATCHES MSVC)
 	set(CSHARP_TEST CSharpPinvoke)
 
 	set(SOURCE_FILES
@@ -42,4 +42,4 @@ set_target_properties(${DLL_NAME} PROPERTIES FOLDER "Wrapper")
 	add_dependencies(${CSHARP_TEST} ShaderConductorWrapper)
 
 	set_target_properties(${CSHARP_TEST} PROPERTIES FOLDER "Wrapper")
-
+endif()
