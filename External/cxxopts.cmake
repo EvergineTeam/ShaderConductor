@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-set(cxxopts_REV "3f2d70530219e09fe7e563f86126b0d3b228a60d")
+set(cxxopts_REV "4bf61f08697b110d9e3991864650a405b3dd515d") # Updated in 2025-03-31 (v3.2.1)
 
 UpdateExternalLib("cxxopts" "https://github.com/jarro2783/cxxopts.git" ${cxxopts_REV})
 

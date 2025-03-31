@@ -263,7 +263,7 @@ if __name__ == "__main__":
 	if (argc > 3):
 		arch = sys.argv[3]
 	else:
-		arch = "x64"
+		arch = hostArch
 	if (argc > 4):
 		configuration = sys.argv[4]
 	else:
