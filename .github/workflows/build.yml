@@ -1,0 +1,92 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:  # Allow manual triggering of the workflow
+
+jobs:
+    
+  windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive  # Ensure submodules are checked out
+
+      - name: Build project
+        run: python3 Buildall.py
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: |
+            Build/vs2022-win-vc143-x64/Bin/Release/dxcompiler.dll
+            Build/vs2022-win-vc143-x64/Bin/Release/ShaderConductor.dll
+            Build/vs2022-win-vc143-x64/Bin/Release/ShaderConductorWrapper.dll
+  
+#  linux:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout repository
+#        uses: actions/checkout@v4
+#        with:
+#          submodules: recursive  # Ensure submodules are checked out
+#
+#      - name: Build project
+#        run: python3 Buildall.py
+#
+#      - name: Upload artifacts
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: linux
+#          path: |
+#            Build/ninja-linux-gcc-arm64-Release/Bin/Release/dxcompiler.dll
+#            Build/ninja-linux-gcc-arm64-Release/Bin/Release/ShaderConductor.dll
+#            Build/ninja-linux-gcc-arm64-Release/Bin/Release/ShaderConductorWrapper.dll
+
+  macos-x64:
+    runs-on: macos-13
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive  # Ensure submodules are checked out
+
+      - name: Build project
+        run: python BuildAll.py ninja clang x64 MinSizeRel 
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-x64
+          path: |
+            Build/ninja-osx-gcc-x64-MinSizeRel/Lib/libdxcompiler.dylib
+            Build/ninja-osx-gcc-x64-MinSizeRel/Lib/libShaderConductor.dylib
+            Build/ninja-osx-gcc-x64-MinSizeRel/Lib/libShaderConductorWrapper.dylib
+
+  macos-arm64:
+    runs-on: macos-15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive  # Ensure submodules are checked out
+
+      - name: Build project
+        run: python BuildAll.py ninja clang arm64 MinSizeRel 
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-arm64
+          path: |
+            Build/ninja-osx-gcc-arm64-MinSizeRel/Lib/libdxcompiler.dylib
+            Build/ninja-osx-gcc-arm64-MinSizeRel/Lib/libShaderConductor.dylib
+            Build/ninja-osx-gcc-arm64-MinSizeRel/Lib/libShaderConductorWrapper.dylib

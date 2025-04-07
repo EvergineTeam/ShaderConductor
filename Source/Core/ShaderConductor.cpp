@@ -27,7 +27,7 @@
 
 #include <dxc/Support/Global.h>
 #include <dxc/Support/Unicode.h>
-#include <dxc/Support/WinAdapter.h>
+#include <dxc/WinAdapter.h>
 #include <dxc/Support/WinIncludes.h>
 
 #include <algorithm>
@@ -46,7 +46,6 @@
 #include <spirv_glsl.hpp>
 #include <spirv_hlsl.hpp>
 #include <spirv_msl.hpp>
-#include <spirv_cross_util.hpp>
 
 #ifdef LLVM_ON_WIN32
 #include <d3d12shader.h>
@@ -153,7 +152,23 @@ namespace
             const char* functionName = "DxcCreateInstance";
 
 #ifdef _WIN32
-            m_dxcompilerDll = ::LoadLibraryA(dllName);
+            HMODULE hm = NULL;
+            if (GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, (LPCSTR) "DllMain",
+                                  &hm) != 0)
+            {
+                char path[MAX_PATH];
+                if (GetModuleFileName(hm, path, sizeof(path)) != 0)
+                {
+                    PathRemoveFileSpec(path);
+                    char finalPath[MAX_PATH];
+                    m_dxcompilerDll = ::LoadLibraryA(PathCombine(finalPath, path, dllName));
+                }
+            }
+
+            if (m_dxcompilerDll == nullptr)
+            {
+                m_dxcompilerDll = ::LoadLibraryA(dllName);
+            }
 #else
             m_dxcompilerDll = ::dlopen(dllName, RTLD_LAZY);
 #endif
@@ -214,7 +229,7 @@ namespace
             }
 
             std::string utf8FileName;
-            if (!Unicode::UTF16ToUTF8String(fileName, &utf8FileName))
+            if (!Unicode::WideToUTF8String(fileName, &utf8FileName))
             {
                 return E_FAIL;
             }
@@ -538,7 +553,7 @@ namespace
             const auto& define = source.defines[i];
 
             std::wstring nameUtf16Str;
-            Unicode::UTF8ToUTF16String(define.name, &nameUtf16Str);
+            Unicode::UTF8ToWideString(define.name, &nameUtf16Str);
             dxcDefineStrings.emplace_back(std::move(nameUtf16Str));
             const wchar_t* nameUtf16 = dxcDefineStrings.back().c_str();
 
@@ -546,7 +561,7 @@ namespace
             if (define.value != nullptr)
             {
                 std::wstring valueUtf16Str;
-                Unicode::UTF8ToUTF16String(define.value, &valueUtf16Str);
+                Unicode::UTF8ToWideString(define.value, &valueUtf16Str);
                 dxcDefineStrings.emplace_back(std::move(valueUtf16Str));
                 valueUtf16 = dxcDefineStrings.back().c_str();
             }
@@ -564,10 +579,10 @@ namespace
         IFTARG(sourceBlob->GetBufferSize() >= 4);
 
         std::wstring shaderNameUtf16;
-        Unicode::UTF8ToUTF16String(source.fileName, &shaderNameUtf16);
+        Unicode::UTF8ToWideString(source.fileName, &shaderNameUtf16);
 
         std::wstring entryPointUtf16;
-        Unicode::UTF8ToUTF16String(source.entryPoint, &entryPointUtf16);
+        Unicode::UTF8ToWideString(source.entryPoint, &entryPointUtf16);
 
         std::vector<std::wstring> dxcArgStrings;
 
@@ -680,8 +695,9 @@ namespace
         return ret;
     }
 
-    Compiler::ResultDesc CrossCompile(const Compiler::ResultDesc& binaryResult, const Compiler::SourceDesc& source,
-                                      const Compiler::Options& options, const Compiler::TargetDesc& target)
+    Compiler::ResultDesc CrossCompile(const Compiler::Options& options, const Compiler::ResultDesc& binaryResult,
+                                      const Compiler::SourceDesc& source,
+                                      const Compiler::TargetDesc& target)
     {
         assert((target.language != ShadingLanguage::Dxil) && (target.language != ShadingLanguage::SpirV));
         assert((binaryResult.target.Size() & (sizeof(uint32_t) - 1)) == 0);
@@ -866,22 +882,27 @@ namespace
             mslOpts.platform = (target.language == ShadingLanguage::Msl_iOS) ? spirv_cross::CompilerMSL::Options::iOS
                                                                              : spirv_cross::CompilerMSL::Options::macOS;
 
+            mslOpts.enable_decoration_binding = options.mslDecoratingBinding;
+
             mslCompiler->set_msl_options(mslOpts);
 
-            const auto& resources = mslCompiler->get_shader_resources();
-
-            uint32_t textureBinding = 0;
-            for (const auto& image : resources.separate_images)
+            if (!mslOpts.enable_decoration_binding)
             {
-                mslCompiler->set_decoration(image.id, spv::DecorationBinding, textureBinding);
-                ++textureBinding;
-            }
+                const auto& resources = mslCompiler->get_shader_resources();
 
-            uint32_t samplerBinding = 0;
-            for (const auto& sampler : resources.separate_samplers)
-            {
-                mslCompiler->set_decoration(sampler.id, spv::DecorationBinding, samplerBinding);
-                ++samplerBinding;
+                uint32_t textureBinding = 0;
+                for (const auto& image : resources.separate_images)
+                {
+                    mslCompiler->set_decoration(image.id, spv::DecorationBinding, textureBinding);
+                    ++textureBinding;
+                }
+
+                uint32_t samplerBinding = 0;
+                for (const auto& sampler : resources.separate_samplers)
+                {
+                    mslCompiler->set_decoration(sampler.id, spv::DecorationBinding, samplerBinding);
+                    ++samplerBinding;
+                }
             }
         }
 
@@ -899,13 +920,10 @@ namespace
         {
             compiler->build_combined_image_samplers();
 
-            if (options.inheritCombinedSamplerBindings)
-            {
-                spirv_cross_util::inherit_combined_sampler_bindings(*compiler);
-            }
-
             for (auto& remap : compiler->get_combined_image_samplers())
             {
+                uint32_t binding = compiler->get_decoration(remap.image_id, spv::DecorationBinding); // or sampler_id.
+                compiler->set_decoration(remap.combined_id, spv::DecorationBinding, binding);
                 compiler->set_name(remap.combined_id,
                                    "SPIRV_Cross_Combined" + compiler->get_name(remap.image_id) + compiler->get_name(remap.sampler_id));
             }
@@ -942,8 +960,8 @@ namespace
         return ret;
     }
 
-    Compiler::ResultDesc ConvertBinary(const Compiler::ResultDesc& binaryResult, const Compiler::SourceDesc& source,
-                                       const Compiler::Options& options, const Compiler::TargetDesc& target)
+    Compiler::ResultDesc ConvertBinary(const Compiler::Options& options, const Compiler::ResultDesc& binaryResult, const Compiler::SourceDesc& source,
+                                       const Compiler::TargetDesc& target)
     {
         if (!binaryResult.hasError)
         {
@@ -964,7 +982,7 @@ namespace
                 case ShadingLanguage::Essl:
                 case ShadingLanguage::Msl_macOS:
                 case ShadingLanguage::Msl_iOS:
-                    return CrossCompile(binaryResult, source, options, target);
+                    return CrossCompile(options, binaryResult, source, target);
 
                 default:
                     llvm_unreachable("Invalid shading language.");
@@ -1146,7 +1164,7 @@ namespace ShaderConductor
                 binaryResult = spirvBinaryResult;
             }
 
-            results[i] = ConvertBinary(binaryResult, sourceOverride, options, targets[i]);
+            results[i] = ConvertBinary(options, binaryResult, sourceOverride, targets[i]);
         }
     }
 
@@ -1231,13 +1249,13 @@ namespace ShaderConductor
                                                           &moduleBlobs[i]));
             IFTARG(moduleBlobs[i]->GetBufferSize() >= 4);
 
-            Unicode::UTF8ToUTF16String(modules.modules[i]->name, &moduleNames[i]);
+            Unicode::UTF8ToWideString(modules.modules[i]->name, &moduleNames[i]);
             moduleNamesUtf16[i] = moduleNames[i].c_str();
             IFT(linker->RegisterLibrary(moduleNamesUtf16[i], moduleBlobs[i]));
         }
 
         std::wstring entryPointUtf16;
-        Unicode::UTF8ToUTF16String(modules.entryPoint, &entryPointUtf16);
+        Unicode::UTF8ToWideString(modules.entryPoint, &entryPointUtf16);
 
         const std::wstring shaderProfile = ShaderProfileName(modules.stage, options.shaderModel);
         CComPtr<IDxcOperationResult> linkResult;
@@ -1250,7 +1268,7 @@ namespace ShaderConductor
         Compiler::SourceDesc source{};
         source.entryPoint = modules.entryPoint;
         source.stage = modules.stage;
-        return ConvertBinary(binaryResult, source, options, target);
+        return ConvertBinary(options, binaryResult, source, target);
     }
 } // namespace ShaderConductor
 

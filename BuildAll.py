@@ -31,12 +31,12 @@ def FindProgramFilesFolder():
 		if "ProgramFiles(x86)" in env:
 			programFilesFolder = env["ProgramFiles(x86)"]
 		else:
-			programFilesFolder = "C:\Program Files (x86)"
+			programFilesFolder = "C:/Program Files (x86)"
 	else:
 		if "ProgramFiles" in env:
 			programFilesFolder = env["ProgramFiles"]
 		else:
-			programFilesFolder = "C:\Program Files"
+			programFilesFolder = "C:/Program Files"
 	return programFilesFolder
 
 def FindVS2017OrUpFolder(programFilesFolder, vsVersion, vsName):
@@ -63,6 +63,9 @@ def FindVS2017OrUpFolder(programFilesFolder, vsVersion, vsName):
 					return tryFolder
 	LogError("Could NOT find VS%s.\n" % vsName)
 	return ""
+
+def FindVS2022Folder(programFilesFolder):
+	return FindVS2017OrUpFolder(programFilesFolder, 17, "2022")
 
 def FindVS2019Folder(programFilesFolder):
 	return FindVS2017OrUpFolder(programFilesFolder, 16, "2019")
@@ -132,7 +135,9 @@ def Build(hostPlatform, hostArch, buildSys, compiler, arch, configuration, tblge
 	batCmd = BatchCommand(hostPlatform)
 	if hostPlatform == "win":
 		programFilesFolder = FindProgramFilesFolder()
-		if (buildSys == "vs2019") or ((buildSys == "ninja") and (compiler == "vc142")):
+		if (buildSys == "vs2022") or ((buildSys == "ninja") and (compiler == "vc143")):
+			vsFolder = FindVS2022Folder(programFilesFolder)
+		elif (buildSys == "vs2019") or ((buildSys == "ninja") and (compiler == "vc142")):
 			vsFolder = FindVS2019Folder(programFilesFolder)
 		elif (buildSys == "vs2017") or ((buildSys == "ninja") and (compiler == "vc141")):
 			vsFolder = FindVS2017Folder(programFilesFolder)
@@ -153,7 +158,10 @@ def Build(hostPlatform, hostArch, buildSys, compiler, arch, configuration, tblge
 		else:
 			LogError("Unsupported architecture.\n")
 		vcToolset = ""
-		if (buildSys == "vs2019") and (compiler == "vc141"):
+		if (buildSys == "vs2022") and (compiler == "vc143"):
+			vcOption += " -vcvars_ver=14.40"
+			vcToolset = "v143,"
+		elif (buildSys == "vs2019") and (compiler == "vc141"):
 			vcOption += " -vcvars_ver=14.1"
 			vcToolset = "v141,"
 		elif ((buildSys == "vs2019") or (buildSys == "vs2017")) and (compiler == "vc140"):
@@ -176,7 +184,9 @@ def Build(hostPlatform, hostArch, buildSys, compiler, arch, configuration, tblge
 		else:
 			batCmd.AddCommand("ninja -j%d" % parallel)
 	else:
-		if buildSys == "vs2019":
+		if buildSys == "vs2022":
+			generator = "\"Visual Studio 17\""
+		elif buildSys == "vs2019":
 			generator = "\"Visual Studio 16\""
 		elif buildSys == "vs2017":
 			generator = "\"Visual Studio 15\""
@@ -205,9 +215,17 @@ def Build(hostPlatform, hostArch, buildSys, compiler, arch, configuration, tblge
 	tblGenPath += "/bin/"
 	clangTblgenPath = tblGenPath + "clang-tblgen"
 	llvmTblGenPath = tblGenPath + "llvm-tblgen"
-	if (hostPlatform == "win"):
+	if hostPlatform == "win":
 		clangTblgenPath += ".exe"
 		llvmTblGenPath += ".exe"
+	elif hostPlatform == "osx":
+		print("Fixing MACOSX rpaths...")
+		libShaderConductorWrapperPath = f"{buildDir}/Lib/libShaderConductorWrapper.dylib"
+		libShaderConductorPath = f"{buildDir}/Lib/libShaderConductor.dylib"
+		subprocess.call(["install_name_tool", libShaderConductorPath, "-delete_rpath", f"{buildDir}/External/DirectXShaderCompiler/lib"])
+		subprocess.call(["install_name_tool", libShaderConductorPath, "-add_rpath", "@loader_path/.",])
+		subprocess.call(["install_name_tool", libShaderConductorWrapperPath, "-delete_rpath", f"{buildDir}/Lib"])
+		subprocess.call(["install_name_tool", libShaderConductorWrapperPath, "-add_rpath", "@loader_path/.",])
 	return (clangTblgenPath, llvmTblGenPath)
 
 if __name__ == "__main__":
@@ -224,23 +242,25 @@ if __name__ == "__main__":
 		hostArch = "x64"
 	elif (hostArch == "i386"):
 		hostArch = "x86"
-	elif (hostArch == "ARM64"):
+	elif (hostArch.lower() == "arm64" or hostArch.lower() == "aarch64"):
 		hostArch = "arm64"
 	else:
 		LogError("Unknown host architecture %s.\n" % hostArch)
 
-	argc = len(sys.argv);
+	argc = len(sys.argv)
 	if (argc > 1):
 		buildSys = sys.argv[1]
 	else:
 		if hostPlatform == "win":
-			buildSys = "vs2019"
+			buildSys = "vs2022"
 		else:
 			buildSys = "ninja"
 	if (argc > 2):
 		compiler = sys.argv[2]
 	else:
-		if buildSys == "vs2019":
+		if buildSys == "vs2022":
+			compiler = "vc143"
+		elif buildSys == "vs2019":
 			compiler = "vc142"
 		elif buildSys == "vs2017":
 			compiler = "vc141"
@@ -251,7 +271,7 @@ if __name__ == "__main__":
 	if (argc > 3):
 		arch = sys.argv[3]
 	else:
-		arch = "x64"
+		arch = hostArch
 	if (argc > 4):
 		configuration = sys.argv[4]
 	else:
