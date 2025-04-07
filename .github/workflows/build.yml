@@ -58,6 +58,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive  # Ensure submodules are checked out
+      - uses: seanmiddleditch/gha-setup-ninja@master
 
       - name: Build project
         run: python BuildAll.py ninja clang x64 MinSizeRel 
@@ -78,6 +79,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive  # Ensure submodules are checked out
+      - uses: seanmiddleditch/gha-setup-ninja@master
 
       - name: Build project
         run: python BuildAll.py ninja clang arm64 MinSizeRel 
