@@ -215,9 +215,16 @@ def Build(hostPlatform, hostArch, buildSys, compiler, arch, configuration, tblge
 	tblGenPath += "/bin/"
 	clangTblgenPath = tblGenPath + "clang-tblgen"
 	llvmTblGenPath = tblGenPath + "llvm-tblgen"
-	if (hostPlatform == "win"):
+	if hostPlatform == "win":
 		clangTblgenPath += ".exe"
 		llvmTblGenPath += ".exe"
+	elif hostPlatform == "osx":
+		libShaderConductorWrapperPath = f"{buildDir}/Lib/libShaderConductorWrapper.dylib"
+		libShaderConductorPath = f"{buildDir}/Lib/libShaderConductor.dylib"
+		subprocess.call(["install_name_tool", libShaderConductorPath, "-delete_rpath", f"{buildDir}/lib"])
+		subprocess.call(["install_name_tool", libShaderConductorPath, "-add_rpath", "@loader_path/.",])
+		subprocess.call(["install_name_tool", libShaderConductorWrapperPath, "-delete_rpath", f"{buildDir}/lib"])
+		subprocess.call(["install_name_tool", libShaderConductorWrapperPath, "-add_rpath", "@loader_path/.",])
 	return (clangTblgenPath, llvmTblGenPath)
 
 if __name__ == "__main__":
