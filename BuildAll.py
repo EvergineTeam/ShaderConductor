@@ -222,9 +222,9 @@ def Build(hostPlatform, hostArch, buildSys, compiler, arch, configuration, tblge
 		print("Fixing MACOSX rpaths...")
 		libShaderConductorWrapperPath = f"{buildDir}/Lib/libShaderConductorWrapper.dylib"
 		libShaderConductorPath = f"{buildDir}/Lib/libShaderConductor.dylib"
-		subprocess.call(["install_name_tool", libShaderConductorPath, "-delete_rpath", f"{buildDir}/lib"])
+		subprocess.call(["install_name_tool", libShaderConductorPath, "-delete_rpath", f"{buildDir}/External/DirectXShaderCompiler/lib"])
 		subprocess.call(["install_name_tool", libShaderConductorPath, "-add_rpath", "@loader_path/.",])
-		subprocess.call(["install_name_tool", libShaderConductorWrapperPath, "-delete_rpath", f"{buildDir}/lib"])
+		subprocess.call(["install_name_tool", libShaderConductorWrapperPath, "-delete_rpath", f"{buildDir}/Lib"])
 		subprocess.call(["install_name_tool", libShaderConductorWrapperPath, "-add_rpath", "@loader_path/.",])
 	return (clangTblgenPath, llvmTblGenPath)
 
