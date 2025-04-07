@@ -219,6 +219,7 @@ def Build(hostPlatform, hostArch, buildSys, compiler, arch, configuration, tblge
 		clangTblgenPath += ".exe"
 		llvmTblGenPath += ".exe"
 	elif hostPlatform == "osx":
+		print("Fixing MACOSX rpaths...")
 		libShaderConductorWrapperPath = f"{buildDir}/Lib/libShaderConductorWrapper.dylib"
 		libShaderConductorPath = f"{buildDir}/Lib/libShaderConductor.dylib"
 		subprocess.call(["install_name_tool", libShaderConductorPath, "-delete_rpath", f"{buildDir}/lib"])
