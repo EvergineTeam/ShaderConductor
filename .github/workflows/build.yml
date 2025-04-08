@@ -25,6 +25,10 @@ jobs:
         with:
           submodules: recursive  # Ensure submodules are checked out
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+
       - name: Build project
         run: python3 Buildall.py vs2022 vc143 x64 MinSizeRel
 
@@ -36,10 +40,6 @@ jobs:
             Build/vs2022-win-vc143-x64/Bin/MinSizeRel/dxcompiler.dll
             Build/vs2022-win-vc143-x64/Bin/MinSizeRel/ShaderConductor.dll
             Build/vs2022-win-vc143-x64/Bin/MinSizeRel/ShaderConductorWrapper.dll
-
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
   
 #  linux:
 #    runs-on: ubuntu-latest
@@ -70,6 +70,10 @@ jobs:
           submodules: recursive  # Ensure submodules are checked out
       - uses: seanmiddleditch/gha-setup-ninja@master
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+
       - name: Build project
         run: python BuildAll.py ninja clang x64 MinSizeRel 
 
@@ -82,10 +86,6 @@ jobs:
             Build/ninja-osx-clang-x64-MinSizeRel/Lib/libShaderConductor.dylib
             Build/ninja-osx-clang-x64-MinSizeRel/Lib/libShaderConductorWrapper.dylib
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
-
   macos-arm64:
     runs-on: macos-15
     steps:
@@ -94,6 +94,10 @@ jobs:
         with:
           submodules: recursive  # Ensure submodules are checked out
       - uses: seanmiddleditch/gha-setup-ninja@master
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
 
       - name: Build project
         run: python BuildAll.py ninja clang arm64 MinSizeRel 
@@ -106,7 +110,3 @@ jobs:
             Build/ninja-osx-clang-arm64-MinSizeRel/Lib/libdxcompiler.dylib
             Build/ninja-osx-clang-arm64-MinSizeRel/Lib/libShaderConductor.dylib
             Build/ninja-osx-clang-arm64-MinSizeRel/Lib/libShaderConductorWrapper.dylib
-
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
