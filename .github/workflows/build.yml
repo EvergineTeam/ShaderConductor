@@ -74,6 +74,7 @@ jobs:
 
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 10
 
   macos-arm64:
     runs-on: macos-15
