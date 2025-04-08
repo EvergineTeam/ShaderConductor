@@ -72,6 +72,9 @@ jobs:
             Build/ninja-osx-clang-x64-MinSizeRel/Lib/libShaderConductor.dylib
             Build/ninja-osx-clang-x64-MinSizeRel/Lib/libShaderConductorWrapper.dylib
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+
   macos-arm64:
     runs-on: macos-15
     steps:
