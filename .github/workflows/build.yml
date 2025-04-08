@@ -36,6 +36,10 @@ jobs:
             Build/vs2022-win-vc143-x64/Bin/MinSizeRel/dxcompiler.dll
             Build/vs2022-win-vc143-x64/Bin/MinSizeRel/ShaderConductor.dll
             Build/vs2022-win-vc143-x64/Bin/MinSizeRel/ShaderConductorWrapper.dll
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
   
 #  linux:
 #    runs-on: ubuntu-latest
@@ -81,7 +85,6 @@ jobs:
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
-        timeout-minutes: 10
 
   macos-arm64:
     runs-on: macos-15
@@ -103,3 +106,7 @@ jobs:
             Build/ninja-osx-clang-arm64-MinSizeRel/Lib/libdxcompiler.dylib
             Build/ninja-osx-clang-arm64-MinSizeRel/Lib/libShaderConductor.dylib
             Build/ninja-osx-clang-arm64-MinSizeRel/Lib/libShaderConductorWrapper.dylib
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
