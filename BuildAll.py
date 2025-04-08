@@ -159,7 +159,7 @@ def Build(hostPlatform, hostArch, buildSys, compiler, arch, configuration, tblge
 			LogError("Unsupported architecture.\n")
 		vcToolset = ""
 		if (buildSys == "vs2022") and (compiler == "vc143"):
-			vcOption += " -vcvars_ver=14.42"
+			vcOption += " -vcvars_ver=14.43"
 			vcToolset = "v143,"
 		elif (buildSys == "vs2019") and (compiler == "vc141"):
 			vcOption += " -vcvars_ver=14.1"
