@@ -41,25 +41,25 @@ jobs:
             Build/vs2022-win-vc143-x64/Bin/MinSizeRel/ShaderConductor.dll
             Build/vs2022-win-vc143-x64/Bin/MinSizeRel/ShaderConductorWrapper.dll
   
-#  linux:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout repository
-#        uses: actions/checkout@v4
-#        with:
-#          submodules: recursive  # Ensure submodules are checked out
-#
-#      - name: Build project
-#        run: python3 Buildall.py
-#
-#      - name: Upload artifacts
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: linux
-#          path: |
-#            Build/ninja-linux-gcc-arm64-Release/Bin/Release/dxcompiler.dll
-#            Build/ninja-linux-gcc-arm64-Release/Bin/Release/ShaderConductor.dll
-#            Build/ninja-linux-gcc-arm64-Release/Bin/Release/ShaderConductorWrapper.dll
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive  # Ensure submodules are checked out
+
+      - name: Build project
+        run: python3 Buildall.py
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: |
+            Build/ninja-linux-gcc-arm64-Release/Bin/Release/dxcompiler.dll
+            Build/ninja-linux-gcc-arm64-Release/Bin/Release/ShaderConductor.dll
+            Build/ninja-linux-gcc-arm64-Release/Bin/Release/ShaderConductorWrapper.dll
 
   macos-x64:
     runs-on: macos-13
