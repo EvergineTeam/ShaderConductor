@@ -57,9 +57,9 @@ jobs:
         with:
           name: linux
           path: |
-            Build/ninja-linux-gcc-arm64-Release/Bin/Release/dxcompiler.dll
-            Build/ninja-linux-gcc-arm64-Release/Bin/Release/ShaderConductor.dll
-            Build/ninja-linux-gcc-arm64-Release/Bin/Release/ShaderConductorWrapper.dll
+            Build/ninja-linux-gcc-arm64-Release/Lib/libdxcompiler.so
+            Build/ninja-linux-gcc-arm64-Release/Lib/libShaderConductor.so
+            Build/ninja-linux-gcc-arm64-Release/Lib/libShaderConductorWrapper.so
 
   macos-x64:
     runs-on: macos-13
