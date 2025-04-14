@@ -50,7 +50,7 @@ jobs:
           submodules: recursive  # Ensure submodules are checked out
 
       - name: Build project
-        run: python3 Buildall.py
+        run: python3 BuildAll.py
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
