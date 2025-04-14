@@ -176,7 +176,7 @@ def Build(hostPlatform, hostArch, buildSys, compiler, arch, configuration, tblge
 		if (configuration == "clangformat"):
 			options = "-DSC_CLANGFORMAT=\"ON\""
 		else:
-			options = f'-DCMAKE_BUILD_TYPE="{configuration}" -DSC_ARCH_NAME="{arch}" {tblgenOptions} -D'
+			options = f'-DCMAKE_BUILD_TYPE="{configuration}" -DSC_ARCH_NAME="{arch}" {tblgenOptions}'
 			if compiler == "gcc" and hostArch != arch and arch == "arm64":
 				options += f" -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++"
 		batCmd.AddCommand("cmake -G Ninja %s ../../" % options)
