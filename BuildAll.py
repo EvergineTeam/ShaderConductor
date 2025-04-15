@@ -120,7 +120,7 @@ def Build(hostPlatform, hostArch, buildSys, compiler, arch, configuration, tblge
 
 	buildDir = "Build/%s-%s-%s-%s" % (buildSys, hostPlatform, compiler, arch)
 	if (not multiConfig) or (configuration == "clangformat"):
-		buildDir += "-%s" % configuration;
+		buildDir += "-%s" % configuration
 	if not os.path.exists(buildDir):
 		os.mkdir(buildDir)
 	os.chdir(buildDir)
@@ -177,8 +177,12 @@ def Build(hostPlatform, hostArch, buildSys, compiler, arch, configuration, tblge
 			options = "-DSC_CLANGFORMAT=\"ON\""
 		else:
 			options = f'-DCMAKE_BUILD_TYPE="{configuration}" -DSC_ARCH_NAME="{arch}" {tblgenOptions}'
-			if compiler == "gcc" and hostArch != arch and arch == "arm64":
-				options += f" -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++"
+			if hostArch != arch and arch == "arm64": ## cross-compiling x64 -> arm64
+				if compiler == "gcc":
+					options += f" -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++"
+				else:
+					options += f" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++"
+					options += f' -DCMAKE_C_FLAGS="--target=aarch64-linux-gnu" -DCMAKE_CXX_FLAGS="--target=aarch64-linux-gnu"'
 		batCmd.AddCommand("cmake -G Ninja %s ../../" % options)
 		if tblgenMode:
 			batCmd.AddCommand("ninja clang-tblgen -j%d" % parallel)
