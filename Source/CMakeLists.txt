@@ -94,6 +94,8 @@ else()
 				set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} --target=elf64-x86-64")
 			endif()
 		endif()
+	elseif(SC_ARCH_NAME STREQUAL "arm64")
+		
 	else()
 		foreach(flagVar
 			CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
