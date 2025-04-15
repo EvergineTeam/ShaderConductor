@@ -182,7 +182,7 @@ def Build(hostPlatform, hostArch, buildSys, compiler, arch, configuration, tblge
 					options += f" -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++"
 				else:
 					options += f" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++"
-					options += f' -DCMAKE_C_FLAGS="--target=aarch64-linux-gnu" -DCMAKE_CXX_FLAGS="--target=aarch64-linux-gnu"'
+					options += f' -DCMAKE_C_FLAGS="--target=aarch64-linux-gnu" -DCMAKE_CXX_FLAGS="--target=aarch64-linux-gnu -DLLVM_ENABLE_LIBCXX=ON"'
 		batCmd.AddCommand("cmake -G Ninja %s ../../" % options)
 		if tblgenMode:
 			batCmd.AddCommand("ninja clang-tblgen -j%d" % parallel)
