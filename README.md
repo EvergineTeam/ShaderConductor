@@ -42,8 +42,8 @@ ShaderConductor has been tested on Windows, Linux, and macOS.
 ```
 where,
 * \<BuildSystem\> can be ninja or vs2022. Default is vs2022.
-* \<Compiler\> can be vc141 on Windows, gcc or clang on Linux, clang on macOS.
-* \<Architecture\> must be x64 (for now).
+* \<Compiler\> can be vc141 (VS2017), vc142 (VS2019), vc143 (VS2022) on Windows, gcc or clang on Linux, clang on macOS.
+* \<Architecture\> x64, x86 or arm64.
 * \<Configuration\> can be Debug, Release, RelWithDebInfo, or MinSizeRel. Default is Release.
  
 This script automatically grabs external dependencies to External folder, generates project file in Build/\<BuildSystem\>-\<Compiler\>-\<Platform\>-\<Architecture\>[-\<Configuration\>], and builds it.
