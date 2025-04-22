@@ -41,7 +41,7 @@ ShaderConductor has been tested on Windows, Linux, and macOS.
   BuildAll.py <BuildSystem> <Compiler> <Architecture> <Configuration>
 ```
 where,
-* \<BuildSystem\> can be ninja or vs2017. Default is vs2017.
+* \<BuildSystem\> can be ninja or vs2022. Default is vs2022.
 * \<Compiler\> can be vc141 on Windows, gcc or clang on Linux, clang on macOS.
 * \<Architecture\> must be x64 (for now).
 * \<Configuration\> can be Debug, Release, RelWithDebInfo, or MinSizeRel. Default is Release.
@@ -53,7 +53,7 @@ This script automatically grabs external dependencies to External folder, genera
 ```
   mkdir Build
   cd Build
-  cmake -G "Visual Studio 15" -T host=x64 -A x64 ../
+  cmake -G "Visual Studio 17" -T host=x64 -A x64 ../
   cmake --build .
 ```
 
