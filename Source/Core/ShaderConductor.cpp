@@ -468,6 +468,19 @@ namespace
             shaderProfile = L"cs";
             break;
 
+        case ShaderStage::RayGeneration:
+        case ShaderStage::Miss:
+        case ShaderStage::ClosestHit:
+        case ShaderStage::AnyHit:
+        case ShaderStage::Intersection:
+            shaderProfile = L"lib";
+            break;
+        case ShaderStage::Mesh:
+            shaderProfile = L"ms";
+            break;
+        case ShaderStage::Amplification:
+            shaderProfile = L"as";
+            break;
         default:
             llvm_unreachable("Invalid shader stage.");
         }
@@ -656,6 +669,18 @@ namespace
             dxcArgStrings.push_back(L"-fvk-t-shift");
             dxcArgStrings.push_back(std::to_wstring(options.shiftAllTexturesBindings));
             dxcArgStrings.push_back(L"all");
+        }
+
+        if (options.shaderModel.major_ver == 6)
+        {
+            if (options.shaderModel.minor_ver >= 7)
+            {
+                dxcArgStrings.push_back(L"-fspv-target-env=vulkan1.2");
+            }
+            else if (options.shaderModel.minor_ver >= 5)
+            {
+                dxcArgStrings.push_back(L"-fspv-target-env=vulkan1.1");
+            }
         }
 
         switch (targetLanguage)

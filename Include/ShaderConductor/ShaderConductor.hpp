@@ -63,6 +63,13 @@ namespace ShaderConductor
         HullShader,
         DomainShader,
         ComputeShader,
+        RayGeneration,
+        Miss,
+        ClosestHit,
+        AnyHit,
+        Intersection,
+        Mesh,
+        Amplification,
 
         NumShaderStages,
     };
