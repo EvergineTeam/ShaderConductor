@@ -178,6 +178,7 @@ def Build(hostPlatform, hostArch, buildSys, compiler, arch, configuration, tblge
 			options = "-DSC_CLANGFORMAT=\"ON\""
 		else:
 			options = f'-DCMAKE_BUILD_TYPE="{configuration}" -DSC_ARCH_NAME="{arch}" {tblgenOptions}'
+			options += " -DSC_CLANGFORMAT=\"OFF\""
 			if hostArch != arch and arch == "arm64": ## cross-compiling x64 -> arm64
 				if compiler == "gcc":
 					options += f" -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++"
@@ -199,11 +200,13 @@ def Build(hostPlatform, hostArch, buildSys, compiler, arch, configuration, tblge
 			generator = "\"Visual Studio 15\""
 		elif buildSys == "vs2015":
 			generator = "\"Visual Studio 14\""
+
 		if (configuration == "clangformat"):
 			cmake_options = "-DSC_CLANGFORMAT=\"ON\""
 			msbuild_options = ""
 		else:
 			cmake_options = "-T %shost=x64 -A %s %s" % (vcToolset, vcArch, tblgenOptions)
+			cmake_options += "-DSC_CLANGFORMAT=\"OFF\""
 			msbuild_options = "/m:%d /v:m /p:Configuration=%s,Platform=%s" % (parallel, configuration, vcArch)
 		batCmd.AddCommand("cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -G %s %s ../../" % (generator, cmake_options))
 		if tblgenMode:
