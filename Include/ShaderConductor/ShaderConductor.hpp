@@ -63,6 +63,13 @@ namespace ShaderConductor
         HullShader,
         DomainShader,
         ComputeShader,
+        RayGeneration,
+        Miss,
+        ClosestHit,
+        AnyHit,
+        Intersection,
+        Mesh,
+        Amplification,
 
         NumShaderStages,
     };
@@ -128,11 +135,11 @@ namespace ShaderConductor
         struct ShaderModel
         {
             uint8_t major_ver : 6;
-            uint8_t minor_ver : 2;
+            uint8_t minor_ver : 6;
 
             uint32_t FullVersion() const noexcept
             {
-                return (major_ver << 2) | minor_ver;
+                return (major_ver << 6) | minor_ver;
             }
 
             bool operator<(const ShaderModel& other) const noexcept
