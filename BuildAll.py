@@ -130,8 +130,8 @@ def Build(hostPlatform, hostArch, buildSys, compiler, arch, configuration, tblge
 	if (tblgenPath != None):
 		tblgenOptions = " -DCLANG_TABLEGEN=\"%s\" -DLLVM_TABLEGEN=\"%s\"" % tblgenPath
 
-	#parallel = multiprocessing.cpu_count()
-	parallel = 1
+	parallel = multiprocessing.cpu_count()
+	#parallel = 1
 
 	batCmd = BatchCommand(hostPlatform)
 	if hostPlatform == "win":

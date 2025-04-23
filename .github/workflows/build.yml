@@ -41,7 +41,7 @@ jobs:
             Build/vs2022-win-vc143-x64/Bin/MinSizeRel/ShaderConductor.dll
             Build/vs2022-win-vc143-x64/Bin/MinSizeRel/ShaderConductorWrapper.dll
   
-  linux:
+  linux-x64:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -60,6 +60,26 @@ jobs:
             Build/ninja-linux-clang-x64-Release/Lib/libdxcompiler.so
             Build/ninja-linux-clang-x64-Release/Lib/libShaderConductor.so
             Build/ninja-linux-clang-x64-Release/Lib/libShaderConductorWrapper.so
+  
+  linux-arm64:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive  # Ensure submodules are checked out
+
+      - name: Build project
+        run: python3 BuildAll.py ninja clang arm64 MinSizeRel
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: |
+            Build/ninja-linux-clang-arm64-Release/Lib/libdxcompiler.so
+            Build/ninja-linux-clang-arm64-Release/Lib/libShaderConductor.so
+            Build/ninja-linux-clang-arm64-Release/Lib/libShaderConductorWrapper.so
 
   macos-arm64:
     runs-on: macos-15
