@@ -175,7 +175,7 @@ def Build(hostPlatform, hostArch, buildSys, compiler, arch, configuration, tblge
 			batCmd.AddCommand("set CC=cl.exe")
 			batCmd.AddCommand("set CXX=cl.exe")
 		if (configuration == "clangformat"):
-			options = "-DSC_CLANGFORMAT=\"ON\""
+			options = " -DSC_CLANGFORMAT=\"ON\""
 		else:
 			options = f'-DCMAKE_BUILD_TYPE="{configuration}" -DSC_ARCH_NAME="{arch}" {tblgenOptions}'
 			options += " -DSC_CLANGFORMAT=\"OFF\""
@@ -202,11 +202,11 @@ def Build(hostPlatform, hostArch, buildSys, compiler, arch, configuration, tblge
 			generator = "\"Visual Studio 14\""
 
 		if (configuration == "clangformat"):
-			cmake_options = "-DSC_CLANGFORMAT=\"ON\""
+			cmake_options = " -DSC_CLANGFORMAT=\"ON\""
 			msbuild_options = ""
 		else:
 			cmake_options = "-T %shost=x64 -A %s %s" % (vcToolset, vcArch, tblgenOptions)
-			cmake_options += "-DSC_CLANGFORMAT=\"OFF\""
+			cmake_options += " -DSC_CLANGFORMAT=\"OFF\""
 			msbuild_options = "/m:%d /v:m /p:Configuration=%s,Platform=%s" % (parallel, configuration, vcArch)
 		batCmd.AddCommand("cmake -DHLSL_DISABLE_SOURCE_GENERATION=ON -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -G %s %s ../../" % (generator, cmake_options))
 		if tblgenMode:

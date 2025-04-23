@@ -29,7 +29,7 @@ jobs:
         uses: mxschmitt/action-tmate@v3
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
 
-      - name: Build project
+      - name: Build x64 project
         run: python3 Buildall.py vs2022 vc143 x64 MinSizeRel
 
       - name: Upload artifacts
@@ -40,6 +40,18 @@ jobs:
             Build/vs2022-win-vc143-x64/Bin/MinSizeRel/dxcompiler.dll
             Build/vs2022-win-vc143-x64/Bin/MinSizeRel/ShaderConductor.dll
             Build/vs2022-win-vc143-x64/Bin/MinSizeRel/ShaderConductorWrapper.dll
+
+      - name: Build arm64 project
+        run: python3 Buildall.py vs2022 vc143 arm64 MinSizeRel
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: |
+            Build/vs2022-win-vc143-arm64/Bin/MinSizeRel/dxcompiler.dll
+            Build/vs2022-win-vc143-arm64/Bin/MinSizeRel/ShaderConductor.dll
+            Build/vs2022-win-vc143-arm64/Bin/MinSizeRel/ShaderConductorWrapper.dll
   
   linux-x64:
     runs-on: ubuntu-latest
@@ -57,9 +69,9 @@ jobs:
         with:
           name: linux
           path: |
-            Build/ninja-linux-clang-x64-Release/Lib/libdxcompiler.so
-            Build/ninja-linux-clang-x64-Release/Lib/libShaderConductor.so
-            Build/ninja-linux-clang-x64-Release/Lib/libShaderConductorWrapper.so
+            Build/ninja-linux-clang-x64-MinSizeRel/Lib/libdxcompiler.so
+            Build/ninja-linux-clang-x64-MinSizeRel/Lib/libShaderConductor.so
+            Build/ninja-linux-clang-x64-MinSizeRel/Lib/libShaderConductorWrapper.so
   
   linux-arm64:
     runs-on: ubuntu-latest
@@ -68,6 +80,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive  # Ensure submodules are checked out
+      
+      - name: Install Cross-Compilation Tools for ARM64
+        run: |
+          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
 
       - name: Build project
         run: python3 BuildAll.py ninja clang arm64 MinSizeRel
@@ -77,9 +93,9 @@ jobs:
         with:
           name: linux
           path: |
-            Build/ninja-linux-clang-arm64-Release/Lib/libdxcompiler.so
-            Build/ninja-linux-clang-arm64-Release/Lib/libShaderConductor.so
-            Build/ninja-linux-clang-arm64-Release/Lib/libShaderConductorWrapper.so
+            Build/ninja-linux-clang-arm64-MinSizeRel/Lib/libdxcompiler.so
+            Build/ninja-linux-clang-arm64-MinSizeRel/Lib/libShaderConductor.so
+            Build/ninja-linux-clang-arm64-MinSizeRel/Lib/libShaderConductorWrapper.so
 
   macos-arm64:
     runs-on: macos-15
