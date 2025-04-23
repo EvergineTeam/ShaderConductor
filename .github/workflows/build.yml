@@ -62,16 +62,16 @@ jobs:
           submodules: recursive  # Ensure submodules are checked out
 
       - name: Build project
-        run: python3 BuildAll.py ninja clang x64 MinSizeRel
+        run: python3 BuildAll.py ninja gcc x64 Release
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: linux-x64
           path: |
-            Build/ninja-linux-clang-x64-MinSizeRel/Lib/libdxcompiler.so
-            Build/ninja-linux-clang-x64-MinSizeRel/Lib/libShaderConductor.so
-            Build/ninja-linux-clang-x64-MinSizeRel/Lib/libShaderConductorWrapper.so
+            Build/ninja-linux-gcc-x64-Release/Lib/libdxcompiler.so
+            Build/ninja-linux-gcc-x64-Release/Lib/libShaderConductor.so
+            Build/ninja-linux-gcc-x64-Release/Lib/libShaderConductorWrapper.so
   
   linux-arm64:
     runs-on: ubuntu-latest
@@ -86,16 +86,16 @@ jobs:
           sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
 
       - name: Build project
-        run: python3 BuildAll.py ninja clang arm64 MinSizeRel
+        run: python3 BuildAll.py ninja gcc arm64 Release
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: linux-arm64
           path: |
-            Build/ninja-linux-clang-arm64-MinSizeRel/Lib/libdxcompiler.so
-            Build/ninja-linux-clang-arm64-MinSizeRel/Lib/libShaderConductor.so
-            Build/ninja-linux-clang-arm64-MinSizeRel/Lib/libShaderConductorWrapper.so
+            Build/ninja-linux-gcc-arm64-Release/Lib/libdxcompiler.so
+            Build/ninja-linux-gcc-arm64-Release/Lib/libShaderConductor.so
+            Build/ninja-linux-gcc-arm64-Release/Lib/libShaderConductorWrapper.so
 
   macos-arm64:
     runs-on: macos-15
