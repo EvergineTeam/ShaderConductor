@@ -610,6 +610,18 @@ namespace
             dxcArgStrings.push_back(L"-Zpc");
         }
 
+        if (targetLanguage == ShadingLanguage::SpirV && options.shaderModel.major_ver == 6)
+        {
+            if (options.shaderModel.minor_ver >= 7)
+            {
+                dxcArgStrings.push_back(L"-fspv-target-env=vulkan1.2");
+            }
+            else if (options.shaderModel.minor_ver >= 5)
+            {
+                dxcArgStrings.push_back(L"-fspv-target-env=vulkan1.1");
+            }
+        }
+
         if (options.enable16bitTypes)
         {
             if (options.shaderModel >= Compiler::ShaderModel{6, 2})
@@ -669,18 +681,6 @@ namespace
             dxcArgStrings.push_back(L"-fvk-t-shift");
             dxcArgStrings.push_back(std::to_wstring(options.shiftAllTexturesBindings));
             dxcArgStrings.push_back(L"all");
-        }
-
-        if (options.shaderModel.major_ver == 6)
-        {
-            if (options.shaderModel.minor_ver >= 7)
-            {
-                dxcArgStrings.push_back(L"-fspv-target-env=vulkan1.2");
-            }
-            else if (options.shaderModel.minor_ver >= 5)
-            {
-                dxcArgStrings.push_back(L"-fspv-target-env=vulkan1.1");
-            }
         }
 
         switch (targetLanguage)
