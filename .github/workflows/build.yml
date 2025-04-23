@@ -17,7 +17,7 @@ on:
 
 jobs:
     
-  windows:
+  windows-x64:
     runs-on: windows-latest
     steps:
       - name: Checkout repository
@@ -29,7 +29,7 @@ jobs:
         uses: mxschmitt/action-tmate@v3
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
 
-      - name: Build x64 project
+      - name: Build project
         run: python3 Buildall.py vs2022 vc143 x64 MinSizeRel
 
       - name: Upload artifacts
@@ -40,8 +40,20 @@ jobs:
             Build/vs2022-win-vc143-x64/Bin/MinSizeRel/dxcompiler.dll
             Build/vs2022-win-vc143-x64/Bin/MinSizeRel/ShaderConductor.dll
             Build/vs2022-win-vc143-x64/Bin/MinSizeRel/ShaderConductorWrapper.dll
+  
+  windows-arm64:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive  # Ensure submodules are checked out
 
-      - name: Build arm64 project
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+
+      - name: Build project
         run: python3 Buildall.py vs2022 vc143 arm64 MinSizeRel
 
       - name: Upload artifacts
