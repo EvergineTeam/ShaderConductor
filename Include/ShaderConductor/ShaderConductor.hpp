@@ -139,7 +139,7 @@ namespace ShaderConductor
 
             uint32_t FullVersion() const noexcept
             {
-                return (major_ver << 2) | minor_ver;
+                return (major_ver << 6) | minor_ver;
             }
 
             bool operator<(const ShaderModel& other) const noexcept
