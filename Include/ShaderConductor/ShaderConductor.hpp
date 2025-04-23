@@ -135,7 +135,7 @@ namespace ShaderConductor
         struct ShaderModel
         {
             uint8_t major_ver : 6;
-            uint8_t minor_ver : 2;
+            uint8_t minor_ver : 6;
 
             uint32_t FullVersion() const noexcept
             {
