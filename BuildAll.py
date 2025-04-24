@@ -236,6 +236,12 @@ def Build(hostPlatform, hostArch, buildSys, compiler, arch, configuration, tblge
 		subprocess.call(["install_name_tool", libShaderConductorPath, "-add_rpath", "@loader_path/.",])
 		subprocess.call(["install_name_tool", libShaderConductorWrapperPath, "-delete_rpath", f"{buildDir}/Lib"])
 		subprocess.call(["install_name_tool", libShaderConductorWrapperPath, "-add_rpath", "@loader_path/.",])
+	elif hostPlatform == "linux":
+		print("Fixing LINUX rpaths...")
+		libShaderConductorWrapperPath = f"{buildDir}/Lib/libShaderConductorWrapper.so"
+		libShaderConductorPath = f"{buildDir}/Lib/libShaderConductor.so"
+		subprocess.call(["patchelf", "--set-rpath", "$ORIGIN", libShaderConductorPath])
+		subprocess.call(["patchelf", "--set-rpath", "$ORIGIN", libShaderConductorWrapperPath])
 	return (clangTblgenPath, llvmTblGenPath)
 
 if __name__ == "__main__":
