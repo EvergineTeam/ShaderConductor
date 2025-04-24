@@ -185,7 +185,7 @@ def Build(hostPlatform, hostArch, buildSys, compiler, arch, configuration, tblge
 				else:
 					options += f" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++"
 					options += f' -DCMAKE_C_FLAGS="--target=aarch64-linux-gnu" -DCMAKE_CXX_FLAGS="--target=aarch64-linux-gnu -DLLVM_ENABLE_LIBCXX=ON"'
-		batCmd.AddCommand("cmake -DHLSL_DISABLE_SOURCE_GENERATION=ON -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -G Ninja %s ../../" % options)
+		batCmd.AddCommand("cmake -DHLSL_DISABLE_SOURCE_GENERATION=ON -G Ninja %s ../../" % options)
 		if tblgenMode:
 			batCmd.AddCommand("ninja clang-tblgen -j%d" % parallel)
 			batCmd.AddCommand("ninja llvm-tblgen -j%d" % parallel)
@@ -208,7 +208,7 @@ def Build(hostPlatform, hostArch, buildSys, compiler, arch, configuration, tblge
 			cmake_options = "-T %shost=x64 -A %s %s" % (vcToolset, vcArch, tblgenOptions)
 			cmake_options += " -DSC_CLANGFORMAT=\"OFF\""
 			msbuild_options = "/m:%d /v:m /p:Configuration=%s,Platform=%s" % (parallel, configuration, vcArch)
-		batCmd.AddCommand("cmake -DHLSL_DISABLE_SOURCE_GENERATION=ON -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -G %s %s ../../" % (generator, cmake_options))
+		batCmd.AddCommand("cmake -DHLSL_DISABLE_SOURCE_GENERATION=ON -G %s %s ../../" % (generator, cmake_options))
 		if tblgenMode:
 			batCmd.AddCommand("MSBuild External\\DirectXShaderCompiler\\tools\\clang\\utils\\TableGen\\clang-tblgen.vcxproj /nologo %s" % msbuild_options)
 			batCmd.AddCommand("MSBuild External\\DirectXShaderCompiler\\utils\\TableGen\\llvm-tblgen.vcxproj /nologo %s" % msbuild_options)
