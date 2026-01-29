@@ -637,6 +637,8 @@ namespace
         if (options.enableDebugInfo)
         {
             dxcArgStrings.push_back(L"-Zi");
+            dxcArgStrings.push_back(L"-fspv-extension=SPV_KHR_non_semantic_info");
+            dxcArgStrings.push_back(L"-fspv-debug=vulkan-with-source");
         }
 
         if (options.disableOptimizations)
