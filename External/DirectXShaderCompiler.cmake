@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-set(DirectXShaderCompiler_REV "5ff9cbc7cb83ab2d5f52255412f61ac3226c4a08") # Updated in 2025-03-28
+set(DirectXShaderCompiler_REV "b106a961d09221b3c5bdb37be45b679257da08b8") # Official v1.8.2505.1 release from 15/07/2025
 
 UpdateExternalLib("DirectXShaderCompiler" "https://github.com/Microsoft/DirectXShaderCompiler.git" ${DirectXShaderCompiler_REV})
 
